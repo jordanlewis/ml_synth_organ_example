@@ -104,17 +104,15 @@ struct midiControllerMapping edirolMapping[] =
     { 0x0, 0x0b, "VolumePedal", NULL, NULL, 0},
 
     /* slider */
-    { 0x0, 0x11, "S1", NULL, Organ_SetDrawbarInv, 0},
-    { 0x1, 0x11, "S2", NULL, Organ_SetDrawbarInv, 1},
-    { 0x2, 0x11, "S3", NULL, Organ_SetDrawbarInv, 2},
-    { 0x3, 0x11, "S4", NULL, Organ_SetDrawbarInv, 3},
+    { 0x1, 80, "S1", NULL, Organ_SetDrawbarInv, 0},
+    { 0x1, 81, "S2", NULL, Organ_SetDrawbarInv, 1},
+    { 0x1, 82, "S3", NULL, Organ_SetDrawbarInv, 2},
+    { 0x1, 83, "S4", NULL, Organ_SetDrawbarInv, 3},
 
-    { 0x4, 0x11, "S5", NULL, Organ_SetDrawbarInv, 4},
-    { 0x5, 0x11, "S6", NULL, Organ_SetDrawbarInv, 5},
-    { 0x6, 0x11, "S7", NULL, Organ_SetDrawbarInv, 6},
-    { 0x7, 0x11, "S8", NULL, Organ_SetDrawbarInv, 7},
-
-    { 0x1, 0x12, "S9", NULL, Organ_SetDrawbarInv, 8},
+    { 0x1, 84, "S5", NULL, Organ_SetDrawbarInv, 4},
+    { 0x1, 85, "S6", NULL, Organ_SetDrawbarInv, 5},
+    { 0x1, 86, "S7", NULL, Organ_SetDrawbarInv, 6},
+    { 0x1, 87, "S8", NULL, Organ_SetDrawbarInv, 7},
 
     /* rotary */
 #ifdef MIDI_STREAM_PLAYER_ENABLED
