@@ -52,9 +52,9 @@
 #endif
 
 
-#define NOTE_ON_AFTER_SETUP /* used to get a test tone without MIDI input. Can be deactivated */
+//#define NOTE_ON_AFTER_SETUP /* used to get a test tone without MIDI input. Can be deactivated */
 
-//#define USE_ML_SYNTH_PRO
+// #define USE_ML_SYNTH_PRO
 
 //#define AUDIO_PASS_THROUGH
 

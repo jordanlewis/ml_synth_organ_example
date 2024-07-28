@@ -45,8 +45,11 @@
 
 #include "config.h"
 
-
 #include <Arduino.h>
+
+#include <arduino-timer.h>
+
+
 
 /*
  * Library can be found on https://github.com/marcel-licence/ML_SynthTools
@@ -79,9 +82,16 @@
 
 char shortName[] = "ML_Organ";
 
+auto timer1sec = timer_create_default();
+auto timer8sec = timer_create_default();
 
 void setup()
 {
+
+    timer1sec.every(1000, loop_1Hz);
+    timer8sec.every(8000, loop_8sec);
+
+    randomSeed(analogRead(0));
     /*
      * this code runs once
      */
@@ -224,6 +234,8 @@ void setup()
 #error only supported by ESP32 platform
 #endif
 #endif
+
+     //loop_8sec(NULL);
 }
 
 #ifdef ESP32
@@ -245,6 +257,8 @@ void Core0TaskSetup()
     /*
      * init your stuff for core0 here
      */
+         Serial.println("Initting core0...");
+
 
 #ifdef OLED_OSC_DISP_ENABLED
     ScopeOled_Setup();
@@ -266,6 +280,14 @@ void Core0TaskLoop()
 #ifdef OLED_OSC_DISP_ENABLED
     ScopeOled_Process();
 #endif
+
+
+    Organ_NoteOn(0, 60, 127);
+
+   delay(500);
+       Organ_NoteOff(0, 60);
+       delay(500);
+
 }
 
 void Core0Task(void *parameter)
@@ -283,30 +305,92 @@ void Core0Task(void *parameter)
 }
 #endif /* ESP32 */
 
-void loop_1Hz()
+bool loop_1Hz(void *)
 {
+   Serial.println("Hi 1hz");
 #ifdef CYCLE_MODULE_ENABLED
     CyclePrint();
 #endif
 #ifdef BLINK_LED_PIN
     Blink_Process();
 #endif
+return true;
+}
+
+/*
+bool loop_8sec(void *)
+{
+      Serial.println("Hi from 8sec loop");
+
+    static bool noteOn = true;
+    static int *lastChord = NULL;
+    if (noteOn)
+    {
+        Serial.println("Note currently on, going to turn off");
+                          Organ_NoteOff(0, 60);
+
+        int *chord = lastChord;
+        if (chord != NULL) {
+            Serial.println("Have last chord...");
+            for (int i = 0; i < 4; i++) {
+              break;
+                if (*chord == 0) {
+                    break;
+                }
+                char numberArray[20];
+                itoa(*chord, numberArray, 10);
+                Serial.println(numberArray);
+                Organ_NoteOff(0, *chord++);
+            }
+        }
+    }
+    else
+    {
+        Serial.println("Note currently off, going to turn on");
+                  Organ_NoteOn(0, 60, 120);
+        int chordIdx = random(N_CHORDS);
+        int *chord = chords[chordIdx];
+        lastChord = chord;
+        for (int i = 0; i < 4; i++) {
+          break;
+            if (*chord == 0) {
+                break;
+            }
+            char numberArray[20];
+            itoa(*chord, numberArray, 10);
+            Serial.println(numberArray);
+            Organ_NoteOn(0, *chord++, 120);
+            break;
+        }
+    }
+    noteOn = !noteOn;
+    return true;
+}
+*/
+bool loop_8sec(void *)
+{
+      Serial.println("Hi from 8sec loop");
+
+    static bool noteOn = false;
+    if (noteOn)
+    {
+                Organ_NoteOff(0, 60);
+
+    }
+    else
+    {
+          Organ_NoteOn(0, 60, 120);
+
+    }
+    noteOn = !noteOn;
+    return true;
 }
 
 void loop()
 {
-    static int loop_cnt_1hz = 0; /*!< counter to allow 1Hz loop cycle */
+    timer1sec.tick();
+    timer8sec.tick();
 
-#ifdef SAMPLE_BUFFER_SIZE
-    loop_cnt_1hz += SAMPLE_BUFFER_SIZE;
-#else
-    loop_cnt_1hz += 1; /* in case only one sample will be processed per loop cycle */
-#endif
-    if (loop_cnt_1hz >= SAMPLE_RATE)
-    {
-        loop_cnt_1hz -= SAMPLE_RATE;
-        loop_1Hz();
-    }
 
     /*
      * MIDI processing
