@@ -202,7 +202,8 @@ void setup()
     timer1sec.every(1000, loop_1Hz);
     timer8sec.every(8000, loop_8sec);
 
-    randomSeed(analogRead(0));
+    // note(jordan): uncommenting this breaks sound output
+    //randomSeed(analogRead(0));
     /*
      * this code runs once
      */
@@ -331,6 +332,9 @@ void setup()
 #endif
 #endif
 
+    Organ_PercussionSet(CTRL_ROTARY_ACTIVE);
+    Organ_PercussionSet(CTRL_ROTARY_ACTIVE);
+
 #ifdef MIDI_STREAM_PLAYER_ENABLED
     MidiStreamPlayer_Init();
 
@@ -346,7 +350,7 @@ void setup()
 #endif
 #endif
 
-     //loop_8sec(NULL);
+     loop_8sec(NULL);
 }
 
 #ifdef ESP32
@@ -418,7 +422,6 @@ void Core0Task(void *parameter)
 
 bool loop_1Hz(void *)
 {
-   Serial.println("Hi 1hz");
 #ifdef CYCLE_MODULE_ENABLED
     CyclePrint();
 #endif
@@ -428,23 +431,19 @@ bool loop_1Hz(void *)
 return true;
 }
 
-/*
+
 bool loop_8sec(void *)
 {
-      Serial.println("Hi from 8sec loop");
+    Serial.println("Hi from 8sec loop");
 
-    static bool noteOn = true;
+    Organ_SetLeslCtrl(random(60,127));
+
     static int *lastChord = NULL;
-    if (noteOn)
-    {
-        Serial.println("Note currently on, going to turn off");
-                          Organ_NoteOff(0, 60);
 
         int *chord = lastChord;
         if (chord != NULL) {
             Serial.println("Have last chord...");
             for (int i = 0; i < 4; i++) {
-              break;
                 if (*chord == 0) {
                     break;
                 }
@@ -453,17 +452,13 @@ bool loop_8sec(void *)
                 Serial.println(numberArray);
                 Organ_NoteOff(0, *chord++);
             }
+            Serial.println("done switching off chord");
         }
-    }
-    else
-    {
-        Serial.println("Note currently off, going to turn on");
-                  Organ_NoteOn(0, 60, 120);
+   
         int chordIdx = random(N_CHORDS);
-        int *chord = chords[chordIdx];
+        chord = chords[chordIdx];
         lastChord = chord;
         for (int i = 0; i < 4; i++) {
-          break;
             if (*chord == 0) {
                 break;
             }
@@ -471,29 +466,8 @@ bool loop_8sec(void *)
             itoa(*chord, numberArray, 10);
             Serial.println(numberArray);
             Organ_NoteOn(0, *chord++, 120);
-            break;
         }
-    }
-    noteOn = !noteOn;
-    return true;
-}
-*/
-bool loop_8sec(void *)
-{
-      Serial.println("Hi from 8sec loop");
 
-    static bool noteOn = false;
-    if (noteOn)
-    {
-                Organ_NoteOff(0, 60);
-
-    }
-    else
-    {
-          Organ_NoteOn(0, 60, 120);
-
-    }
-    noteOn = !noteOn;
     return true;
 }
 
@@ -742,4 +716,3 @@ void ScanI2C(void)
     }
 }
 #endif /* (defined ARDUINO_GENERIC_F407VGTX) || (defined ARDUINO_DISCO_F407VG) */
-
